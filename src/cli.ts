@@ -111,52 +111,75 @@ function encode(value: string): string {
 	return encodeURIComponent(value.trim().toLowerCase());
 }
 
-const USAGE = `VerifiedDR CLI — public authority & trust data over the VerifiedDR API.
+const USAGE = `VerifiedDR CLI — authority & trust data over the VerifiedDR API.
 
-Auth: set VERIFIEDDR_API_KEY=vdr_… (Pro/Agency dashboard) or pass --key.
+Quickstart:
+  npx skills add thijssmudde/verifieddr-cli   # install the agent skill
+  export VERIFIEDDR_API_KEY=vdr_your_key       # free key in your dashboard
+  vdr sites:list                               # list your sites
+  vdr authority:lookup stripe.com              # any site's authority
 
 Public discovery (any approved site):
-  vdr lookup <domain>                    Authority: DR, TrueDR, trust, evidence
-  vdr find [filters]                     Discover trusted sites, ranked by TrueDR
-  vdr snippets <domain>                  Badge / embed snippets
-  vdr categories                         Valid category values (no key needed)
+  vdr authority:lookup <domain>          DR, TrueDR, trust score, evidence
+  vdr discover:find [filters]            Discover trusted sites, ranked by TrueDR
+  vdr badge:snippets <domain>            Badge / embed snippets
+  vdr categories:list                    Valid category values (no key needed)
 
 Your own sites (owner-scoped):
-  vdr sites                              List your sites + metrics
-  vdr site <domain>                      One of your sites with DR/traffic trends
-  vdr truedr <domain> [--detailed]       Your site's TrueDR (+ signal breakdown)
-  vdr export <domain>                    Machine-readable export of your site
-  vdr monitor [<domain>] [--daily]       Watch changes + trust alerts
-  vdr submit <url> [--title --description --category --xhandle]
-  vdr verify <domain>                    Re-check the badge embed
+  vdr sites:list                         List your sites + metrics
+  vdr sites:get <domain>                 One of your sites with DR/traffic trends
+  vdr sites:truedr <domain> [--detailed] Your site's TrueDR (+ signal breakdown)
+  vdr sites:export <domain>              Machine-readable export of your site
+  vdr sites:monitor [<domain>] [--daily] Watch changes + trust alerts
+  vdr sites:submit <url> [--title --description --category --xhandle]
+  vdr sites:verify <domain>              Re-check the badge embed
 
-find filters:
+discover:find filters:
   --category <slug>  --min-truedr <n>  --min-dr <n>
   --traffic-validated  --include-unverified  --limit <n> (max 50)
 
 Global flags: --key vdr_…   --base <url>`;
 
+/**
+ * Pre-colon verbs from v0.1.x, kept as hidden aliases so older scripts and
+ * agents keep working after the move to resource:action commands.
+ */
+const ALIASES: Record<string, string> = {
+	lookup: "authority:lookup",
+	find: "discover:find",
+	sites: "sites:list",
+	site: "sites:get",
+	truedr: "sites:truedr",
+	export: "sites:export",
+	monitor: "sites:monitor",
+	submit: "sites:submit",
+	verify: "sites:verify",
+	snippets: "badge:snippets",
+	categories: "categories:list",
+};
+
 async function main(): Promise<void> {
-	const [command, ...args] = process.argv.slice(2);
+	const [rawCommand, ...args] = process.argv.slice(2);
+	const command = rawCommand ? (ALIASES[rawCommand] ?? rawCommand) : rawCommand;
 
 	switch (command) {
-		case "lookup":
+		case "authority:lookup":
 			return request(args, "GET", `/api/v1/lookup/${encode(domainArg(args))}`);
-		case "snippets":
+		case "badge:snippets":
 			return request(
 				args,
 				"GET",
 				`/api/v1/snippets/${encode(domainArg(args))}`,
 			);
-		case "export":
+		case "sites:export":
 			return request(args, "GET", `/api/v1/export/${encode(domainArg(args))}`);
-		case "site":
+		case "sites:get":
 			return request(args, "GET", `/api/v1/sites/${encode(domainArg(args))}`);
-		case "sites":
+		case "sites:list":
 			return request(args, "GET", "/api/v1/sites");
-		case "categories":
+		case "categories:list":
 			return request(args, "GET", "/api/v1/categories", undefined, false);
-		case "truedr": {
+		case "sites:truedr": {
 			const detailed = flag(args, "--detailed") ? "?detailed=true" : "";
 			return request(
 				args,
@@ -164,7 +187,7 @@ async function main(): Promise<void> {
 				`/api/v1/sites/${encode(domainArg(args))}/truedr${detailed}`,
 			);
 		}
-		case "find": {
+		case "discover:find": {
 			const q = new URLSearchParams();
 			const category = option(args, "--category");
 			if (category) q.set("category", category);
@@ -179,7 +202,7 @@ async function main(): Promise<void> {
 			const qs = q.toString();
 			return request(args, "GET", `/api/v1/find${qs ? `?${qs}` : ""}`);
 		}
-		case "monitor": {
+		case "sites:monitor": {
 			const q = new URLSearchParams();
 			if (flag(args, "--daily")) q.set("daily", "true");
 			const domain = args.find((a) => !a.startsWith("--"));
@@ -187,11 +210,11 @@ async function main(): Promise<void> {
 			const qs = q.toString();
 			return request(args, "GET", `/api/v1/monitor${qs ? `?${qs}` : ""}`);
 		}
-		case "verify":
+		case "sites:verify":
 			return request(args, "POST", "/api/v1/verify", {
 				url: domainArg(args),
 			});
-		case "submit": {
+		case "sites:submit": {
 			const url = domainArg(args);
 			const body: Json = { url };
 			const title = option(args, "--title");
@@ -212,7 +235,7 @@ async function main(): Promise<void> {
 			return;
 		default:
 			process.stderr.write(`${USAGE}\n`);
-			fail(`Unknown command: ${command}`, 2);
+			fail(`Unknown command: ${rawCommand}`, 2);
 	}
 }
 

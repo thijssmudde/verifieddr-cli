@@ -8,57 +8,65 @@ JSON, ideal for scripts, CI, dashboards, and AI agents.
 It is a thin HTTP client: it talks only to `https://verifieddr.com/api/v1` with
 your own API key. It never touches a database or any admin credential.
 
-## Install
+## Quickstart
 
 ```bash
-npm install -g verifieddr
-# or run without installing:
-npx verifieddr lookup vercel.com
+# Install the skill
+npx skills add thijssmudde/verifieddr-cli
+
+# Set your API key
+export VERIFIEDDR_API_KEY=vdr_your_key
+
+# List your sites
+vdr sites:list
+
+# Look up any domain's authority
+vdr authority:lookup stripe.com
 ```
 
+Get a free key in your VerifiedDR dashboard — the **free tier includes 100
+calls/month**; **Pro** and **Agency** raise the limit. Install the CLI with
+`npm install -g verifieddr`, or run any command through `npx verifieddr …`.
 Requires Node.js ≥ 18.
 
-## Authenticate
-
-Every command except `categories` needs an API key. Create one free in your
-VerifiedDR dashboard — the **free tier includes 100 calls/month**; **Pro** and
-**Agency** raise the limit. Calls are metered against your monthly quota;
+Every command except `categories:list` is metered against your monthly quota;
 remaining quota and your tier are printed to stderr (and returned as
-`X-API-Quota-Remaining` / `X-API-Tier` headers).
+`X-API-Quota-Remaining` / `X-API-Tier` headers). Pass `--key vdr_…` instead of
+the env var on any command.
 
-```bash
-export VERIFIEDDR_API_KEY=vdr_xxxxxxxxxxxxxxxxxxxx
-# or pass --key vdr_… on any command
-```
+## Commands
 
-## Usage
+Commands follow a `resource:action` shape.
 
 ```bash
 # Public discovery — works for ANY approved site
-vdr lookup stripe.com                 # DR, TrueDR, trust score, evidence
-vdr find --category ai --min-truedr 50 --traffic-validated --limit 10
-vdr snippets stripe.com               # badge / embed snippets
-vdr categories                        # valid category values (no key needed)
+vdr authority:lookup stripe.com       # DR, TrueDR, trust score, evidence
+vdr discover:find --category ai --min-truedr 50 --traffic-validated --limit 10
+vdr badge:snippets stripe.com         # badge / embed snippets
+vdr categories:list                   # valid category values (no key needed)
 
 # Your own sites (owner-scoped)
-vdr sites                             # list your sites + metrics
-vdr site example.com                  # one site with DR/traffic trends
-vdr truedr example.com --detailed     # TrueDR + full signal breakdown
-vdr export example.com                # machine-readable export
-vdr monitor --daily                   # watch all your sites for changes
-vdr monitor example.com               # watch one site
-vdr submit https://example.com --title "Example" --category saas
-vdr verify example.com                # re-check the badge embed
+vdr sites:list                        # list your sites + metrics
+vdr sites:get example.com             # one site with DR/traffic trends
+vdr sites:truedr example.com --detailed   # TrueDR + full signal breakdown
+vdr sites:export example.com          # machine-readable export
+vdr sites:monitor --daily             # watch all your sites for changes
+vdr sites:monitor example.com         # watch one site
+vdr sites:submit https://example.com --title "Example" --category saas
+vdr sites:verify example.com          # re-check the badge embed
 ```
+
+> The pre-`0.2` verbs (`lookup`, `find`, `sites`, `monitor`, …) still work as
+> hidden aliases, so existing scripts keep running.
 
 ### What's public vs. private
 
-- **Public fields, any site** (`lookup`, `find`, `snippets`): DR, TrueDR, trust
-  score, confidence, traffic validation, public backlink totals, badge links.
-  Never owner identity, billing state, or the per-signal trust breakdown.
-- **Owner-scoped** (`sites`, `site`, `truedr`, `export`, `monitor`, `submit`,
-  `verify`): only your own claimed sites. `truedr --detailed` returns the full
-  signal breakdown for sites you own.
+- **Public fields, any site** (`authority:lookup`, `discover:find`,
+  `badge:snippets`): DR, TrueDR, trust score, confidence, traffic validation,
+  public backlink totals, badge links. Never owner identity, billing state, or
+  the per-signal trust breakdown.
+- **Owner-scoped** (`sites:*`): only your own claimed sites.
+  `sites:truedr --detailed` returns the full signal breakdown for sites you own.
 
 ## Output
 
@@ -66,7 +74,7 @@ Everything is JSON on stdout with an `ok` boolean; quota and diagnostics go to
 stderr. Pipe into `jq`:
 
 ```bash
-vdr lookup stripe.com | jq '.lookup.authority'
+vdr authority:lookup stripe.com | jq '.lookup.authority'
 ```
 
 ## Exit codes
@@ -83,8 +91,12 @@ vdr lookup stripe.com | jq '.lookup.authority'
 ## Using it with AI agents
 
 This repo ships an agent **skill** under [`skills/verifieddr-authority`](skills/verifieddr-authority/SKILL.md)
-that teaches assistants when and how to call these commands. Point your agent
-framework at that folder.
+that teaches assistants when and how to call these commands. Install it straight
+into your agent with:
+
+```bash
+npx skills add thijssmudde/verifieddr-cli
+```
 
 ## License
 

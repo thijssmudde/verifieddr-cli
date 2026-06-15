@@ -3,10 +3,10 @@
 Base URL: `https://verifieddr.com/api/v1`. Auth: `Authorization: Bearer vdr_…`.
 The CLI mirrors these endpoints one-to-one. JSON examples are abbreviated.
 
-## lookup (public, any approved site)
+## authority:lookup (public, any approved site)
 
 ```bash
-vdr lookup stripe.com
+vdr authority:lookup stripe.com
 # GET /api/v1/lookup/stripe.com
 ```
 
@@ -49,10 +49,10 @@ vdr lookup stripe.com
 - The per-signal trust **breakdown** is intentionally NOT returned here. It is
   available only via `truedr --detailed` for sites you own.
 
-## find (public discovery)
+## discover:find (public discovery)
 
 ```bash
-vdr find --category ai --min-truedr 50 --traffic-validated --limit 10
+vdr discover:find --category ai --min-truedr 50 --traffic-validated --limit 10
 # GET /api/v1/find?category=ai&minTrueDr=50&trafficValidated=true&limit=10
 ```
 
@@ -61,21 +61,21 @@ TrueDR then DR. Filters: `--category <slug>`, `--min-truedr <n>`, `--min-dr <n>`
 `--traffic-validated`, `--include-unverified`, `--limit <n>` (max 50). Use for
 partner / sponsor / trusted-site discovery — not keyword or backlink analysis.
 
-## snippets (public)
+## badge:snippets (public)
 
 ```bash
-vdr snippets stripe.com
+vdr badge:snippets stripe.com
 # GET /api/v1/snippets/stripe.com
 ```
 
 Returns page/badge/OG links plus ready-to-paste `html`, `htmlDark`, `htmlTrueDr`,
 `markdown`, and `shareText`, and the available badge `styles`.
 
-## monitor (owner-scoped)
+## sites:monitor (owner-scoped)
 
 ```bash
-vdr monitor --daily            # all your sites
-vdr monitor example.com        # one of your sites
+vdr sites:monitor --daily            # all your sites
+vdr sites:monitor example.com        # one of your sites
 # GET /api/v1/monitor?daily=true[&domain=example.com]
 ```
 
@@ -83,27 +83,28 @@ vdr monitor example.com        # one of your sites
 `backlinks` (incl. `newReferringDomains` / `lostReferringDomains`),
 `trafficValidation`, `alerts` (spam/trust), and a `summary` string.
 
-## export (owner-scoped)
+## sites:export (owner-scoped)
 
 ```bash
-vdr export example.com
+vdr sites:export example.com
 # GET /api/v1/export/example.com
 ```
 
 `{ export: { site, authority, snippets } }` — `site` is the compact metric row,
 `authority` is the full public lookup payload, `snippets` are the badge embeds.
 
-## sites / site / truedr / submit / verify (owner-scoped)
+## sites:* (owner-scoped)
 
 ```bash
-vdr sites                              # GET /api/v1/sites
-vdr site example.com                   # GET /api/v1/sites/example.com
-vdr truedr example.com --detailed      # GET /api/v1/sites/example.com/truedr?detailed=true
-vdr submit https://example.com --title "Example" --category saas   # POST /api/v1/sites
-vdr verify example.com                 # POST /api/v1/verify
+vdr sites:list                          # GET /api/v1/sites
+vdr sites:get example.com               # GET /api/v1/sites/example.com
+vdr sites:truedr example.com --detailed # GET /api/v1/sites/example.com/truedr?detailed=true
+vdr sites:submit https://example.com --title "Example" --category saas   # POST /api/v1/sites
+vdr sites:verify example.com            # POST /api/v1/verify
 ```
 
-`truedr --detailed` includes the full per-signal `breakdown` for owned sites.
+`sites:truedr --detailed` includes the full per-signal `breakdown` for owned
+sites. The pre-`0.2` verbs (`sites`, `site`, `truedr`, …) still work as aliases.
 
 ## Errors
 
