@@ -1,0 +1,48 @@
+{
+	"name": "verifieddr",
+	"version": "0.1.0",
+	"description": "CLI for the VerifiedDR API — look up DR, TrueDR, trust scores, discover trusted sites, and monitor authority changes.",
+	"type": "module",
+	"bin": {
+		"vdr": "dist/cli.js",
+		"verifieddr": "dist/cli.js"
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE"
+	],
+	"engines": {
+		"node": ">=18"
+	},
+	"scripts": {
+		"build": "tsc -p tsconfig.json && chmod +x dist/cli.js",
+		"prepublishOnly": "npm run build",
+		"dev": "node --import tsx src/cli.ts"
+	},
+	"keywords": [
+		"verifieddr",
+		"domain-rating",
+		"dr",
+		"truedr",
+		"seo",
+		"backlinks",
+		"trust-score",
+		"authority",
+		"cli"
+	],
+	"license": "MIT",
+	"homepage": "https://verifieddr.com",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/thijssmudde/verifieddr-cli.git"
+	},
+	"bugs": {
+		"url": "https://github.com/thijssmudde/verifieddr-cli/issues"
+	},
+	"devDependencies": {
+		"@types/node": "^22.10.0",
+		"tsx": "^4.19.2",
+		"typescript": "^5.7.2"
+	}
+}
