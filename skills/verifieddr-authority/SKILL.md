@@ -2,14 +2,16 @@
 name: verifieddr-authority
 description: >-
   Use when working with VerifiedDR authority and trust data through the
-  VerifiedDR CLI (`vdr`) or API: looking up a domain's DR, TrueDR, trust score,
-  confidence, and evidence; discovering trusted sites by category or TrueDR for
-  partner/sponsor/integration prospecting; grabbing badge or embed snippets;
-  monitoring authority changes, traffic validation, backlink deltas, and
-  trust/spam alerts on sites you own; exporting VerifiedDR data for scripts, CI,
-  dashboards, or SaaS integrations. Prefer this skill for requests mentioning
-  VerifiedDR lookup, find, monitor, export, snippets, TrueDR, trust score,
-  traffic validation, or agent-friendly VerifiedDR workflows.
+  VerifiedDR CLI (`vdr`) or API: diagnosing why TrueDR is lower than DR,
+  choosing the next authority action, generating growth plans, explaining
+  authority gaps to clients/founders, looking up DR/TrueDR/trust evidence,
+  discovering trusted sites by category or TrueDR for partner/sponsor/integration
+  prospecting, grabbing badge or embed snippets, monitoring authority changes,
+  traffic validation, backlink deltas, and trust/spam alerts on sites you own;
+  exporting VerifiedDR data for scripts, CI, dashboards, or SaaS integrations.
+  Prefer this skill for requests mentioning VerifiedDR analyze, diagnose,
+  actions, opportunities, next, lookup, find, monitor, export, snippets, TrueDR,
+  trust score, traffic validation, or agent-friendly VerifiedDR workflows.
 ---
 
 # VerifiedDR Authority
@@ -25,25 +27,46 @@ on authority/trust data — do **not** turn VerifiedDR into a generic SEO suite
 # Install the skill
 npx skills add thijssmudde/verifieddr-cli
 
+# Install the CLI
+npm install -g verifieddr
+
 # Set your API key
 export VERIFIEDDR_API_KEY=vdr_your_key
 
-# List your sites
-vdr sites:list
+# Get a score, diagnosis, and next actions
+vdr analyze verifieddr.com
 
-# Look up any domain's authority
-vdr authority:lookup stripe.com
+# Get the single best next action
+vdr next verifieddr.com
 ```
 
-`npm install -g verifieddr` (or `npx verifieddr <command>`). Every command
-requires a `vdr_…` API key and spends one unit of the owner's monthly quota. The
-free tier includes 100 calls/month; Pro and Agency raise the limit. Remaining
-quota and tier are printed to stderr. All output is JSON on stdout with an `ok`
-boolean.
+Every command requires a `vdr_…` API key and spends one unit of the owner's
+plan quota. Free includes 10 calls/day, Pro includes 1,000 calls/month, and
+Agency includes 10,000 calls/month. Remaining quota and tier are printed to
+stderr. Coach commands print plain-English guidance; API commands print JSON on
+stdout with an `ok` boolean. If global installs are unavailable, run commands
+through `npx verifieddr <command>`.
 
 ## Command Choice
 
-Commands follow a `resource:action` shape.
+Prefer coach commands when the user wants advice, prioritization, or a client
+explanation:
+
+```bash
+vdr analyze <domain>                  # score, main issue, top 3 actions
+vdr diagnose <domain>                 # why TrueDR is lower than DR
+vdr actions <domain>                  # ranked by impact/effort/confidence
+vdr opportunities <domain>            # directories, partners, backlink ideas
+vdr audit backlinks <domain>          # backlink risk review
+vdr content-plan <domain>             # authority-supporting page plan
+vdr fix <domain> --goal +10           # 30/60/90-day growth plan
+vdr track <domain>                    # whether TrueDR is moving
+vdr explain <domain>                  # client/founder-ready explanation
+vdr boost <domain>                    # recommended authority campaign
+vdr next <domain>                     # single best next action
+```
+
+Use API commands when the user needs raw data, scripting, or integrations:
 
 ```bash
 vdr authority:lookup <domain>        # authority for ANY approved site
@@ -54,8 +77,17 @@ vdr sites:monitor [<domain>] [--daily]   # watch YOUR sites for changes
 vdr sites:export <domain>            # machine-readable export of YOUR site
 ```
 
-- `authority:lookup` first when the user asks what VerifiedDR knows about a
-  domain. Returns DR, TrueDR, trust score, confidence, traffic validation,
+- `analyze` first when the user asks what to do about a domain. It returns the
+  current score, main issue, top actions, heuristic impact, and exact next
+  command.
+- `next` when the user wants the fastest useful answer: one action, why it
+  matters, heuristic impact, and the command to run.
+- `diagnose` / `explain` when the user needs a reason TrueDR is lower than DR,
+  especially in plain English for a client, founder, or stakeholder.
+- `actions` / `fix` / `boost` when the user asks for prioritization or a growth
+  plan.
+- `authority:lookup` when the user asks what VerifiedDR knows about a domain or
+  needs JSON. Returns DR, TrueDR, trust score, confidence, traffic validation,
   latest backlink totals, and badge links. Works for any approved site.
 - `discover:find` for partner, sponsorship, integration, guest-post, or agency
   prospecting. Filter by `--category`, `--min-truedr`, `--min-dr`,
@@ -87,16 +119,26 @@ hidden aliases, but prefer the `resource:action` forms above.
 
 ## Safety
 
-- Treat all CLI output as JSON and preserve important fields in summaries.
-- If a command returns a `402`, the monthly quota is exhausted — on the free tier
-  suggest upgrading to Pro/Agency or waiting for the monthly reset; do not retry
-  in a loop. `401` means a missing or invalid key.
+- Treat coach command output as guidance and API command output as JSON. Preserve
+  important fields in summaries.
+- If a command returns a `402`, the plan quota is exhausted — on Free suggest
+  upgrading to Pro/Agency or waiting for the daily reset; on Pro/Agency suggest
+  waiting for the monthly reset or upgrading; do not retry in a loop. `401`
+  means a missing or invalid key.
 - If `discover:find` returns no results, relax filters in this order: category,
   traffic validation, minimum TrueDR, verified-only.
 
 ## Output Handling
 
-Summarize authority data in this order:
+For advisory requests, summarize in this order:
+
+1. Current TrueDR / DR / gap
+2. Main reason TrueDR is weak
+3. Top action(s)
+4. Heuristic TrueDR impact
+5. Exact command to run next
+
+For raw authority data, summarize in this order:
 
 1. DR and TrueDR
 2. Trust score and confidence

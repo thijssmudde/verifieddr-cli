@@ -1,9 +1,9 @@
 # VerifiedDR CLI
 
 A tiny, dependency-free CLI for the [VerifiedDR](https://verifieddr.com) API.
-Look up a domain's **DR**, **TrueDR**, trust score and confidence, discover
-trusted sites, grab badge snippets, and monitor authority changes — all as clean
-JSON, ideal for scripts, CI, dashboards, and AI agents.
+Use it to understand why a domain's **TrueDR** is weak, what to do next, and
+whether the work is improving authority over time. The lower-level API commands
+still return clean JSON for scripts, CI, dashboards, and AI agents.
 
 It is a thin HTTP client: it talks only to `https://verifieddr.com/api/v1` with
 your own API key. It never touches a database or any admin credential.
@@ -14,29 +14,48 @@ your own API key. It never touches a database or any admin credential.
 # Install the skill
 npx skills add thijssmudde/verifieddr-cli
 
+# Install the CLI
+npm install -g verifieddr
+
 # Set your API key
 export VERIFIEDDR_API_KEY=vdr_your_key
 
-# List your sites
-vdr sites:list
+# Get a score, diagnosis, and next actions
+vdr analyze verifieddr.com
 
-# Look up any domain's authority
-vdr authority:lookup stripe.com
+# Get the single best next action
+vdr next verifieddr.com
 ```
 
-Get a free key in your VerifiedDR dashboard — the **free tier includes 100
-calls/month**; **Pro** and **Agency** raise the limit. Install the CLI with
-`npm install -g verifieddr`, or run any command through `npx verifieddr …`.
-Requires Node.js ≥ 18.
+Get a free key in your VerifiedDR dashboard — **Free** includes 10 calls/day,
+**Pro** includes 1,000 calls/month, and **Agency** includes 10,000 calls/month.
+Requires Node.js ≥ 18. If global installs are unavailable, run any command
+through `npx verifieddr …`.
 
-Every command needs a key and is metered against your monthly quota;
-remaining quota and your tier are printed to stderr (and returned as
+Every command needs a key and is metered against your plan quota; remaining
+quota and your tier are printed to stderr (and returned as
 `X-API-Quota-Remaining` / `X-API-Tier` headers). Pass `--key vdr_…` instead of
 the env var on any command.
 
 ## Commands
 
-Commands follow a `resource:action` shape.
+The coach commands are the default product surface:
+
+```bash
+vdr analyze example.com              # score, main issue, top 3 actions
+vdr diagnose example.com             # why TrueDR is lower than DR
+vdr actions example.com              # ranked by impact, effort, confidence
+vdr opportunities example.com        # directories, partners, backlink ideas
+vdr audit backlinks example.com      # backlink risk review
+vdr content-plan example.com         # authority-supporting page plan
+vdr fix example.com --goal +10       # 30/60/90-day growth plan
+vdr track example.com                # whether TrueDR is moving
+vdr explain example.com              # client/founder-ready explanation
+vdr boost example.com                # recommended authority campaign
+vdr next example.com                 # single best next action
+```
+
+The API commands follow a `resource:action` shape:
 
 ```bash
 # Public discovery — works for ANY approved site
@@ -70,8 +89,9 @@ vdr sites:verify example.com          # re-check the badge embed
 
 ## Output
 
-Everything is JSON on stdout with an `ok` boolean; quota and diagnostics go to
-stderr. Pipe into `jq`:
+Coach commands print plain-English guidance on stdout. API commands print JSON
+on stdout with an `ok` boolean; quota and diagnostics go to stderr. Pipe API
+commands into `jq`:
 
 ```bash
 vdr authority:lookup stripe.com | jq '.lookup.authority'

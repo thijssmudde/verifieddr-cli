@@ -3,6 +3,30 @@
 Base URL: `https://verifieddr.com/api/v1`. Auth: `Authorization: Bearer vdr_…`.
 The CLI mirrors these endpoints one-to-one. JSON examples are abbreviated.
 
+## Coach commands (plain text)
+
+Coach commands call `authority:lookup` under the hood, then turn the public
+authority data into advice. They print plain text, not JSON.
+
+```bash
+vdr analyze example.com
+vdr diagnose example.com
+vdr actions example.com
+vdr opportunities example.com
+vdr audit backlinks example.com
+vdr content-plan example.com
+vdr fix example.com --goal +10
+vdr track example.com
+vdr explain example.com
+vdr boost example.com
+vdr next example.com
+```
+
+`analyze` prints current TrueDR/DR/gap, the main issue, top actions, heuristic
+TrueDR impact, and the exact command to run next. `next` is the shortest
+recommendation surface: one action, why it matters, heuristic impact, and the
+command to execute.
+
 ## authority:lookup (public, any approved site)
 
 ```bash
@@ -30,6 +54,9 @@ vdr authority:lookup stripe.com
       "globalRank": 1200,
       "referringDomains": 51000,
       "backlinks": 9100000,
+      "topBacklinks": [
+        { "sourceDomain": "example.edu", "dr": 82, "url": "https://example.edu/post", "anchor": "Stripe", "follow": true }
+      ],
       "gainedDomains": 320,
       "lostDomains": 110,
       "reportCreatedAt": "2026-06-01T00:00:00.000Z"
@@ -108,7 +135,8 @@ sites. The pre-`0.2` verbs (`sites`, `site`, `truedr`, …) still work as aliase
 
 ## Errors
 
-- `401` missing/invalid key · `402` monthly quota exhausted (free tier = 100
-  calls/month) · `404` unknown site (or not owned, for owner-scoped commands).
+- `401` missing/invalid key · `402` quota exhausted (Free = 10 calls/day, Pro =
+  1,000 calls/month, Agency = 10,000 calls/month) · `404` unknown site (or not
+  owned, for owner-scoped commands).
 - Headers `X-API-Quota-Limit` / `X-API-Quota-Remaining` / `X-API-Tier` are
   printed to stderr by the CLI.
