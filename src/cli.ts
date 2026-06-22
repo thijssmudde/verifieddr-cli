@@ -181,7 +181,7 @@ function encode(value: string): string {
 const USAGE = `VerifiedDR CLI — authority & trust data over the VerifiedDR API.
 
 Quickstart:
-  npx skills add thijssmudde/verifieddr-cli   # install the agent skill
+  npx skills add VerifiedDR/verifieddr-cli   # install the agent skill
   npm install -g verifieddr                    # install the CLI
   export VERIFIEDDR_API_KEY=vdr_your_key       # free key in your dashboard
   vdr analyze verifieddr.com                   # score + next actions

@@ -25,7 +25,7 @@ on authority/trust data — do **not** turn VerifiedDR into a generic SEO suite
 
 ```bash
 # Install the skill
-npx skills add thijssmudde/verifieddr-cli
+npx skills add VerifiedDR/verifieddr-cli
 
 # Install the CLI
 npm install -g verifieddr

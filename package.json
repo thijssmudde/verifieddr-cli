@@ -35,10 +35,10 @@
 	"homepage": "https://verifieddr.com",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/thijssmudde/verifieddr-cli.git"
+		"url": "git+https://github.com/VerifiedDR/verifieddr-cli.git"
 	},
 	"bugs": {
-		"url": "https://github.com/thijssmudde/verifieddr-cli/issues"
+		"url": "https://github.com/VerifiedDR/verifieddr-cli/issues"
 	},
 	"devDependencies": {
 		"@types/node": "^22.10.0",

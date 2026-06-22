@@ -12,7 +12,7 @@ your own API key. It never touches a database or any admin credential.
 
 ```bash
 # Install the skill
-npx skills add thijssmudde/verifieddr-cli
+npx skills add VerifiedDR/verifieddr-cli
 
 # Install the CLI
 npm install -g verifieddr
@@ -132,7 +132,7 @@ that teaches assistants when and how to call these commands. Install it straight
 into your agent with:
 
 ```bash
-npx skills add thijssmudde/verifieddr-cli
+npx skills add VerifiedDR/verifieddr-cli
 ```
 
 After installing the skill, you can ask for outcomes instead of memorizing
