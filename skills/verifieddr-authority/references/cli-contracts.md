@@ -70,6 +70,9 @@ vdr authority:lookup stripe.com
       "topBacklinks": [
         { "sourceDomain": "example.edu", "dr": 82, "url": "https://example.edu/post", "anchor": "Stripe", "follow": true }
       ],
+      "bottomBacklinks": [
+        { "sourceDomain": "weak.example", "dr": 2, "url": "https://weak.example/link", "anchor": "Stripe", "follow": false }
+      ],
       "gainedDomains": 320,
       "lostDomains": 110,
       "reportCreatedAt": "2026-06-01T00:00:00.000Z"

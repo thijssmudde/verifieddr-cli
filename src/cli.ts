@@ -287,6 +287,13 @@ type Lookup = {
 			anchor?: string | null;
 			follow?: boolean;
 		}>;
+		bottomBacklinks?: Array<{
+			sourceDomain?: string;
+			dr?: number;
+			url?: string;
+			anchor?: string | null;
+			follow?: boolean;
+		}>;
 		reportCreatedAt?: string | null;
 	};
 	links?: {
@@ -758,6 +765,7 @@ function coachAuditBacklinks(lookup: Lookup): void {
 	const trust = num(lookup.authority?.trustScore);
 	const referringDomains = num(lookup.evidence?.referringDomains);
 	const topBacklinks = lookup.evidence?.topBacklinks ?? [];
+	const bottomBacklinks = lookup.evidence?.bottomBacklinks ?? [];
 	printLines([`Backlink audit for ${domain}:`, ""]);
 	printLines([
 		`Trust score: ${score(trust)} / 100`,
@@ -773,6 +781,14 @@ function coachAuditBacklinks(lookup: Lookup): void {
 			const source = link.sourceDomain || link.url || "unknown source";
 			const dr = typeof link.dr === "number" ? `DR ${link.dr}` : "DR unknown";
 			return `${index + 1}. ${source} (${dr})`;
+		}),
+		bottomBacklinks.length > 0 ? "" : null,
+		bottomBacklinks.length > 0 ? "Weakest public backlink evidence:" : null,
+		...bottomBacklinks.slice(0, 5).map((link, index) => {
+			const source = link.sourceDomain || link.url || "unknown source";
+			const dr = typeof link.dr === "number" ? `DR ${link.dr}` : "DR unknown";
+			const follow = link.follow === false ? ", nofollow" : "";
+			return `${index + 1}. ${source} (${dr}${follow})`;
 		}),
 		"",
 		"Next:",
