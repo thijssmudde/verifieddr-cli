@@ -42,7 +42,9 @@ through VerifiedDR's partnership mail system, using the same source ownership
 check, target opt-out handling, Pro/Agency contact quota, request logging, and
 sender confirmation as the dashboard UI. Optional `--subject` and `--message`
 override the generated outreach draft. Add `--dry-run` to print the exact POST
-payload without sending.
+payload without sending. Free users receive `402` with `upgradeUrl`,
+`requiredPlan`, and `blockedFeature`; agents should show that URL as the next
+step.
 
 ## authority:lookup (public, any approved site)
 

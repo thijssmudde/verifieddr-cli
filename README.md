@@ -42,7 +42,9 @@ command through `npx verifieddr ...`.
 Every command needs a key and is metered against your plan quota; remaining
 quota and your tier are printed to stderr, and returned as
 `X-API-Quota-Remaining` / `X-API-Tier` headers). Pass `--key vdr_...` instead of
-the env var on any command.
+the env var on any command. When a feature or quota is locked, the CLI prints an
+`upgradeUrl`; the default upgrade path is
+`https://verifieddr.com/pricing?source=cli&feature=api`.
 
 ## Commands
 
@@ -83,6 +85,8 @@ vdr opportunities example.com --contact partner-slug --message "Custom outreach 
 
 The email is sent through VerifiedDR's partnership mail system, using the same
 ownership, opt-out, quota, and confirmation flow as the dashboard UI.
+Free users receive an upgrade link before partner details or outreach can start:
+`https://verifieddr.com/pricing?source=cli&feature=partnerships`.
 
 The API commands follow a `resource:action` shape:
 

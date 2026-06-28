@@ -86,6 +86,8 @@ which sends drafted mail through VerifiedDR's partnership mail system without
 exposing the target owner's email. Add `--subject`, `--message`, and `--dry-run`
 to validate the target, quota, and payload before sending. Partner candidates require an
 additional opportunities lookup, so this command can spend two quota calls.
+When outreach is blocked, surface the CLI/API `upgradeUrl`; the default
+conversion URL is `https://verifieddr.com/pricing?source=cli&feature=partnerships`.
 
 Use API commands when the user needs raw data, scripting, or integrations:
 
@@ -154,7 +156,8 @@ copy.
   `--contact <slug-or-domain> --dry-run` to validate the target, quota, and exact
   payload for approval, then remove `--dry-run` only after the user approves the
   listed target and copy. Custom outreach must be passed with `--subject` and/or
-  `--message`; it sends mail through VerifiedDR.
+  `--message`; it sends mail through VerifiedDR. If the CLI returns an
+  `upgradeUrl`, include it in the next action.
 - `authority:lookup` when the user asks what VerifiedDR knows about a domain or
   needs JSON. Returns DR, TrueDR, trust score, confidence, traffic validation,
   latest backlink totals, and badge links. Works for any approved site.
@@ -202,10 +205,11 @@ hidden aliases, but prefer the `resource:action` forms above.
 
 - Treat coach command output as guidance and API command output as JSON. Preserve
   important fields in summaries.
-- If a command returns a `402`, the plan quota is exhausted. On Free, suggest
-  upgrading to Pro/Agency or waiting for the daily reset; on Pro/Agency suggest
-  waiting for the monthly reset or upgrading; do not retry in a loop. `401`
-  means a missing or invalid key.
+- If a command returns a `402`, the feature is locked or the plan quota is
+  exhausted. Include any returned `upgradeUrl` in the answer. On Free, suggest
+  upgrading to Pro/Agency or waiting for the reset when relevant; on Pro/Agency
+  suggest waiting for the monthly reset or upgrading; do not retry in a loop.
+  `401` means a missing or invalid key.
 - If `discover:find` returns no results, relax filters in this order: category,
   traffic validation, minimum TrueDR, verified-only.
 

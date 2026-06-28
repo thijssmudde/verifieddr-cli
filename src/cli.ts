@@ -11,6 +11,10 @@
  */
 
 const DEFAULT_BASE = "https://verifieddr.com";
+const DEFAULT_UPGRADE_URL =
+	"https://verifieddr.com/pricing?source=cli&feature=api";
+const PARTNERSHIP_UPGRADE_URL =
+	"https://verifieddr.com/pricing?source=cli&feature=partnerships";
 
 type Json = Record<string, unknown>;
 type ApiTier = "free" | "pro" | "agency" | string;
@@ -25,6 +29,35 @@ function out(value: unknown): void {
 
 function fail(message: string, code = 1): never {
 	out({ ok: false, error: message });
+	process.exit(code);
+}
+
+function failApiError(
+	message: string,
+	code: number,
+	data: Json,
+	status: number,
+): never {
+	const upgradeUrl =
+		typeof data.upgradeUrl === "string"
+			? data.upgradeUrl
+			: status === 402
+				? DEFAULT_UPGRADE_URL
+				: undefined;
+	out({
+		ok: false,
+		error: message,
+		...(upgradeUrl ? { upgradeUrl } : {}),
+		...(typeof data.requiredPlan === "string"
+			? { requiredPlan: data.requiredPlan }
+			: {}),
+		...(typeof data.blockedFeature === "string"
+			? { blockedFeature: data.blockedFeature }
+			: {}),
+	});
+	if (upgradeUrl) {
+		process.stderr.write(`Upgrade: ${upgradeUrl}\n`);
+	}
 	process.exit(code);
 }
 
@@ -171,7 +204,12 @@ async function requestResult(
 				? String((data as Json).error)
 				: `HTTP ${response.status}`;
 		if (!failOnError) throw new Error(message);
-		fail(message, response.status === 402 ? 5 : 6);
+		failApiError(
+			message,
+			response.status === 402 ? 5 : 6,
+			data as Json,
+			response.status,
+		);
 	}
 	return { data: { ok: true, ...(data as Json) }, tier };
 }
@@ -877,10 +915,10 @@ async function coachOpportunities(
    Preview drafted mail: vdr opportunities ${domain} --contact ${site.slug || site.domain || ""} --dry-run
    Send after approval: vdr opportunities ${domain} --contact ${site.slug || site.domain || ""}`
 				: `${index + 1}. ${candidateLabel(site, index, showNames)}
-   Upgrade required to reveal the partner and start outreach.`,
+   Upgrade to reveal the partner and start outreach: ${PARTNERSHIP_UPGRADE_URL}`,
 		),
 		candidates.length > 0
-			? "Free users see a limited preview. Upgrade to reveal partner details and start outreach."
+			? `Free users see a limited preview. Upgrade to reveal partner details and start outreach: ${PARTNERSHIP_UPGRADE_URL}`
 			: null,
 		"",
 		"Next:",
@@ -1059,7 +1097,7 @@ async function coachNext(
 			? `Approve + send: vdr opportunities ${domain} --contact ${partner.slug || partner.domain || ""}`
 			: null,
 		partner && (!showNames || !(partner.slug || partner.domain))
-			? "Upgrade required to reveal the partner and start outreach."
+			? `Upgrade to reveal the partner and start outreach: ${PARTNERSHIP_UPGRADE_URL}`
 			: null,
 	]);
 }
