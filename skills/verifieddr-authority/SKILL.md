@@ -79,12 +79,12 @@ vdr next <domain>                     # best next partner/action
 The coach loop is partner-first: `next` prefers one concrete verified partner
 action when that is the fastest useful authority move. `opportunities` can
 surface potential partnership candidates, the outreach angle, and the exact
-command to approve before sending. Partner names are shown on every plan;
-sending the contact request is the paid action. Pro and Agency users can contact
-a listed partner with `vdr opportunities <domain> --contact <slug-or-domain>`,
+command to approve before sending. Partner names are shown only on paid plans;
+free users see a limited preview and must upgrade before outreach can start. Pro
+and Agency users can contact a listed partner with `vdr opportunities <domain> --contact <slug-or-domain>`,
 which sends drafted mail through VerifiedDR's partnership mail system without
 exposing the target owner's email. Add `--subject`, `--message`, and `--dry-run`
-to preview the exact payload before sending. Partner candidates require an
+to validate the target, quota, and payload before sending. Partner candidates require an
 additional opportunities lookup, so this command can spend two quota calls.
 
 Use API commands when the user needs raw data, scripting, or integrations:
@@ -149,10 +149,11 @@ copy.
 - `actions` / `fix` / `boost` when the user asks for prioritization or a growth
   plan.
 - `opportunities` when the user needs directories, backlink ideas, or partner
-  targets. Partner names are shown on every plan; contacting them is the paid
-  action. Use `--contact <slug-or-domain> --dry-run` to show the exact payload
-  for approval, then remove `--dry-run` only after the user approves the listed
-  target and copy. Custom outreach must be passed with `--subject` and/or
+  targets. Partner names are shown only on paid plans; free users see a limited
+  preview and must upgrade before outreach can start. Use
+  `--contact <slug-or-domain> --dry-run` to validate the target, quota, and exact
+  payload for approval, then remove `--dry-run` only after the user approves the
+  listed target and copy. Custom outreach must be passed with `--subject` and/or
   `--message`; it sends mail through VerifiedDR.
 - `authority:lookup` when the user asks what VerifiedDR knows about a domain or
   needs JSON. Returns DR, TrueDR, trust score, confidence, traffic validation,

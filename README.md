@@ -68,13 +68,13 @@ The coach loop is partner-first: `vdr next` prefers one concrete verified
 partner action when that is the fastest useful authority move. `vdr
 opportunities` shows potential partnership candidates, the suggested outreach
 angle, and the exact command to approve before sending. Partner names are shown
-on every plan; sending the contact request is the paid action. Partner matching
-uses the lookup and opportunities APIs, so it can spend two quota calls when
-partner candidates are requested.
+only on paid plans; free users see a limited preview. Starting outreach is a
+paid action. Partner matching uses the lookup and opportunities APIs, so it can
+spend two quota calls when partner candidates are requested.
 
 Pro and Agency users can contact a listed partner without seeing the owner's
-email address. Use `--dry-run` first when you want to confirm the custom subject
-or message before sending:
+email address. Use `--dry-run` first to validate the target, quota, and message
+before sending:
 
 ```bash
 vdr opportunities example.com --contact partner-slug --dry-run

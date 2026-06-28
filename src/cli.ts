@@ -783,34 +783,36 @@ async function contactPartnershipOpportunity(
 	if (subject) body.subject = subject;
 	const message = option(args, "--message");
 	if (message) body.message = message;
-
 	if (flag(args, "--dry-run")) {
-		out({
-			ok: true,
-			dryRun: true,
-			wouldSend: {
-				method: "POST",
-				path: "/api/v1/find",
-				body,
-			},
-			note:
-				"Nothing was sent. Run the same command without --dry-run to send the partnership request.",
-		});
-		return;
+		body.dryRun = true;
 	}
 
 	const result = await requestData(args, "POST", "/api/v1/find", body);
 	const contact = result.contact as
 		| {
+				dryRun?: boolean;
 				sent?: boolean;
 				to?: Lookup;
 				subject?: string;
+				message?: string;
 				quota?: { used?: number; limit?: number | null; plan?: string };
 		  }
 		| undefined;
 	const to = contact?.to;
 	const label = to?.title || to?.domain || target;
 	const quota = contact?.quota;
+	if (contact?.dryRun) {
+		printLines([
+			`Dry run: partnership email to ${label}.`,
+			contact.subject ? `Subject: ${contact.subject}` : null,
+			contact.message ? `Message: ${contact.message}` : null,
+			quota
+				? `Partnership contacts: ${quota.used ?? "?"}/${quota.limit ?? "unlimited"} used (${quota.plan ?? "plan"})`
+				: null,
+			"Nothing was sent. Run the same command without --dry-run to send the partnership request.",
+		]);
+		return;
+	}
 	printLines([
 		`Sent partnership email to ${label}.`,
 		contact?.subject ? `Subject: ${contact.subject}` : null,
@@ -869,14 +871,16 @@ async function coachOpportunities(
 			? "Potential partnerships:"
 			: null,
 		...candidates.map((site, index) =>
-			showNames
+			showNames && (site.slug || site.domain)
 				? `${index + 1}. ${candidateLabel(site, index, showNames)}${site.opportunity?.reason ? `
    Angle: ${site.opportunity.type || "Partnership"} - ${site.opportunity.reason}` : ""}
-   Send drafted mail: vdr opportunities ${domain} --contact ${site.slug || site.domain || ""}`
-				: `${index + 1}. ${candidateLabel(site, index, showNames)}`,
+   Preview drafted mail: vdr opportunities ${domain} --contact ${site.slug || site.domain || ""} --dry-run
+   Send after approval: vdr opportunities ${domain} --contact ${site.slug || site.domain || ""}`
+				: `${index + 1}. ${candidateLabel(site, index, showNames)}
+   Upgrade required to reveal the partner and start outreach.`,
 		),
 		candidates.length > 0
-			? "Partner names are shown on every plan. Sending a contact request is a paid action."
+			? "Free users see a limited preview. Upgrade to reveal partner details and start outreach."
 			: null,
 		"",
 		"Next:",
@@ -1048,11 +1052,14 @@ async function coachNext(
 		partner?.opportunity?.reason
 			? `Angle: ${partner.opportunity.type || "Partnership"} - ${partner.opportunity.reason}`
 			: null,
-		partner && showNames
+		partner && showNames && (partner.slug || partner.domain)
+			? `Preview before sending: vdr opportunities ${domain} --contact ${partner.slug || partner.domain || ""} --dry-run`
+			: null,
+		partner && showNames && (partner.slug || partner.domain)
 			? `Approve + send: vdr opportunities ${domain} --contact ${partner.slug || partner.domain || ""}`
 			: null,
-		partner && !showNames
-			? "Partner names are shown on every plan. Sending a contact request is a paid action."
+		partner && (!showNames || !(partner.slug || partner.domain))
+			? "Upgrade required to reveal the partner and start outreach."
 			: null,
 	]);
 }

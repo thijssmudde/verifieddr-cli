@@ -33,8 +33,9 @@ VerifiedDR can surface a reasonable match.
 
 `opportunities` also calls the server-side opportunities mode to list potential
 partnership candidates, outreach angles, and contact commands. Partner names are
-shown on every plan; sending the contact request is the paid action. This can
-spend two quota calls: one lookup and one opportunities request.
+shown only on paid plans; free users see a limited preview and must upgrade
+before outreach can start. This can spend two quota calls: one lookup and one
+opportunities request.
 
 `opportunities --contact <slug-or-domain>` sends mail to the listed candidate
 through VerifiedDR's partnership mail system, using the same source ownership
