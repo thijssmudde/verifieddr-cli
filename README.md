@@ -146,7 +146,7 @@ vdr authority:lookup stripe.com | jq '.lookup.authority'
 | 5 | quota exhausted (HTTP 402) |
 | 6 | other API error |
 
-## Using it with AI agents
+## 5 Actionable SEO Outcomes
 
 This repo ships an agent **skill** under [`skills/verifieddr-authority`](skills/verifieddr-authority/SKILL.md)
 that teaches assistants when and how to call these commands. Install it straight
@@ -156,8 +156,23 @@ into your agent with:
 npx skills add VerifiedDR/verifieddr-cli
 ```
 
-After installing the skill, you can ask for outcomes instead of memorizing
+After installing the skill, ask for one of these outcomes instead of memorizing
 commands:
+
+1. **Growth Loop** — diagnose the TrueDR gap, check detailed actions, disavow
+   only if spam links are found, pick a partner, and end with the command to
+   approve.
+2. **Partner Outreach** — find one verified partner, preview the exact outreach
+   with `--dry-run`, then send only after approval.
+3. **Progress Report** — check TrueDR/DR movement, audit weak backlink evidence,
+   pick one next action, and write a founder or client-ready update.
+4. **Fix Weak Authority Signals** — inspect the owner-scoped signal breakdown,
+   choose the relevant fix, and avoid blanket cleanup when spam is not the
+   issue.
+5. **Monitor Metrics** — set a recurring authority check for DR, TrueDR, traffic
+   validation, backlink deltas, and trust alerts.
+
+Example prompts:
 
 ```text
 Run the VerifiedDR growth loop for example.com.
